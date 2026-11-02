@@ -557,8 +557,16 @@ function _injectBlurLayer(bwin, dataUrl) {
 
 function _applyKdeWallpaperBlur(bwin) {
     const wp = _kdeWallpaperPath();
-    if (!wp) { console.warn('[Adam] KDE wallpaper blur: no Image= found in plasma config'); return; }
-    _injectWallpaperFile(bwin, wp, 'KDE');
+    if (!wp) console.warn('[Adam] KDE wallpaper blur: no Image= found in plasma config');
+    if (wp && _injectWallpaperFile(bwin, wp, 'KDE')) return;
+    // KDE can use a slideshow/plugin or a wallpaper path we cannot read. Paint
+    // the root canvas, not a negative-z-index div that may disappear behind it.
+    // The native base remains opaque across navigation; palette modes can still
+    // paint their own colour above it. No screen capture or desktop changes.
+    bwin.setBackgroundColor('#1c1c1e');
+    bwin.webContents.insertCSS('html:root { background: var(--adam-bg-color, #1c1c1e) !important; }')
+        .catch(e => console.warn('[Adam] KDE background CSS failed:', e.message));
+    console.log('[Adam] KDE wallpaper unavailable — using solid background');
 }
 
 // The wallpaper currently drawn behind the interface in blur mode.

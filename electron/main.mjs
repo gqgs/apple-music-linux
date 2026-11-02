@@ -925,10 +925,11 @@ function createWindow() {
             if (op >= 1) clearInterval(step);
         }, 16);
         // Blur layer (needs executeJavaScript, so it runs after the page is loaded; showWindow fires
-        // on app:ui-ready). Hyprland reads its own wallpaper config; Windows and GNOME use the
+        // on app:ui-ready). Hyprland and KDE read their wallpaper config; GNOME uses its
         // wallpaper file; anything else falls back to a software screenshot blur (X11 / Sway).
         if (_isHyprland) _applyHyprlandWallpaperBlur(win);
         else if (_acrylicBackend) { /* the acrylic window is the blur; the page overlays are applied on load */ }
+        else if (_isKde) _applyKdeWallpaperBlur(win);
         else if (_desktop.includes('gnome')) {
             _applyPlatformWallpaperBlur(win).then(ok => { if (!ok && _useSoftBlur) refreshBlurBg(); });
         } else if (_useSoftBlur) refreshBlurBg();
